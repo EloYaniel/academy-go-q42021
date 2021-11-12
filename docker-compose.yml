@@ -1,0 +1,10 @@
+version: "3"
+services:
+  go_watcher:
+    build:
+      context: .
+    container_name: go_bootcamp_watcher
+    ports:
+      - 8080:8080
+    volumes:
+      - .:/app
