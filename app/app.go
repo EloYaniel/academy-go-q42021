@@ -1,26 +1,24 @@
 package app
 
 import (
-	"encoding/json"
-	"net/http"
-
-	controllers "github.com/EloYaniel/academy-go-q42021/controllers"
+	ctr "github.com/EloYaniel/academy-go-q42021/controllers"
+	repo "github.com/EloYaniel/academy-go-q42021/repositories/implementations"
+	srv "github.com/EloYaniel/academy-go-q42021/services"
 	"github.com/gorilla/mux"
 )
 
 func InitApp() *mux.Router {
+	csvmlbrepository := repo.NewCSVMLBPlayerRepository("data/mlb_players.csv")
+
+	service := srv.NewMLBPlayerService(csvmlbrepository)
+
+	healthcontroller := ctr.NewHealthController()
+	mlbplayercontroller := ctr.NewMLBPlayerController(service)
+
 	r := mux.NewRouter()
-
-	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
-	})
-
-	r.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode("Welcome to The Golang Bootcamp API")
-	})
-
-	r.HandleFunc("/mlb-players", controllers.GetMLBPlayers)
-	r.HandleFunc("/mlb-players/{id}", controllers.GetMLBPlayerByID)
+	r.HandleFunc("/health", healthcontroller.CheckHealth)
+	r.HandleFunc("/mlb-players", mlbplayercontroller.GetMLBPlayers)
+	r.HandleFunc("/mlb-players/{id}", mlbplayercontroller.GetMLBPlayerByID)
 
 	return r
 }

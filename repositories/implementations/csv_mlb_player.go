@@ -11,10 +11,16 @@ import (
 )
 
 // CSVMLBPlayerRepository implements MLBPlayerRepository interface
-type CSVMLBPlayerRepository struct{}
+type CSVMLBPlayerRepository struct {
+	filePath string
+}
+
+func NewCSVMLBPlayerRepository(filePath string) *CSVMLBPlayerRepository {
+	return &CSVMLBPlayerRepository{filePath: filePath}
+}
 
 func (repo *CSVMLBPlayerRepository) GetMLBPlayers() ([]e.MLBPlayer, error) {
-	f, err := os.Open("data/mlb_players.csv")
+	f, err := os.Open(repo.filePath)
 
 	if err != nil {
 		log.Println("error opening the file", err)
@@ -30,10 +36,25 @@ func (repo *CSVMLBPlayerRepository) GetMLBPlayers() ([]e.MLBPlayer, error) {
 	var players []e.MLBPlayer
 	for i, line := range data {
 		if i != 0 {
-			id, _ := strconv.Atoi(line[0])
-			height, _ := strconv.Atoi(line[4])
-			weight, _ := strconv.ParseFloat(line[5], 32)
-			age, _ := strconv.ParseFloat(line[6], 32)
+			id, err := strconv.Atoi(line[0])
+
+			if err != nil {
+				return nil, errors.New("error casting ID" + err.Error())
+			}
+			height, err := strconv.Atoi(line[4])
+
+			if err != nil {
+				return nil, errors.New("error casting Height" + err.Error())
+			}
+			weight, err := strconv.ParseFloat(line[5], 32)
+			if err != nil {
+				return nil, errors.New("error casting Weight" + err.Error())
+			}
+			age, err := strconv.ParseFloat(line[6], 32)
+
+			if err != nil {
+				return nil, errors.New("error casting Age" + err.Error())
+			}
 
 			players = append(players, e.MLBPlayer{
 				ID:       id,
@@ -64,5 +85,5 @@ func (repo *CSVMLBPlayerRepository) GetMLBPlayerByID(id int) (*e.MLBPlayer, erro
 		}
 	}
 
-	return &e.MLBPlayer{}, nil
+	return nil, nil
 }

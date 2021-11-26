@@ -5,21 +5,30 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/EloYaniel/academy-go-q42021/entities"
-	r "github.com/EloYaniel/academy-go-q42021/repositories/implementations"
-	"github.com/EloYaniel/academy-go-q42021/services"
+	e "github.com/EloYaniel/academy-go-q42021/entities"
 	"github.com/gorilla/mux"
 )
+
+type mlbPlayerService interface {
+	GetMLBPlayers() ([]e.MLBPlayer, error)
+	GetMLBPlayerByID(id int) (*e.MLBPlayer, error)
+}
 
 type errorMessage struct {
 	Message string `json:"message"`
 }
 
-var service services.MLBPlayerService = *services.NewMLBPlayerService(&r.CSVMLBPlayerRepository{})
+type MLBPlayerController struct {
+	service mlbPlayerService
+}
 
-func GetMLBPlayers(w http.ResponseWriter, r *http.Request) {
+func NewMLBPlayerController(service mlbPlayerService) *MLBPlayerController {
+	return &MLBPlayerController{service: service}
+}
+
+func (ctr *MLBPlayerController) GetMLBPlayers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	players, err := service.GetMLBPlayers()
+	players, err := ctr.service.GetMLBPlayers()
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		json.NewEncoder(w).Encode(errorMessage{
@@ -31,7 +40,7 @@ func GetMLBPlayers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(players)
 }
 
-func GetMLBPlayerByID(w http.ResponseWriter, r *http.Request) {
+func (ctr *MLBPlayerController) GetMLBPlayerByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
@@ -44,7 +53,7 @@ func GetMLBPlayerByID(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	player, err := service.GetMLBPlayerByID(id)
+	player, err := ctr.service.GetMLBPlayerByID(id)
 
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -55,7 +64,7 @@ func GetMLBPlayerByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if (*player == entities.MLBPlayer{}) {
+	if player == nil {
 		w.WriteHeader(http.StatusNotFound)
 		json.NewEncoder(w).Encode(errorMessage{
 			Message: "Player not found",
