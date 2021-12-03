@@ -1,8 +1,6 @@
 package services
 
 import (
-	"log"
-
 	e "github.com/EloYaniel/academy-go-q42021/entities"
 	r "github.com/EloYaniel/academy-go-q42021/repositories/contracts"
 )
@@ -16,21 +14,9 @@ func NewMLBPlayerService(r r.MLBPlayerRepository) *MLBPlayerService {
 }
 
 func (s *MLBPlayerService) GetMLBPlayers() ([]e.MLBPlayer, error) {
-	players, err := s.repository.GetMLBPlayers()
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	return players, err
+	return s.repository.GetMLBPlayers()
 }
 
 func (s *MLBPlayerService) GetMLBPlayerByID(id int) (*e.MLBPlayer, error) {
-	player, err := s.repository.GetMLBPlayerByID(id)
-
-	if err != nil {
-		log.Println(err)
-	}
-
-	return player, err
+	return s.repository.GetMLBPlayerByID(id)
 }
