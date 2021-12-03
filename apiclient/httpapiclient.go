@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -43,7 +42,6 @@ func (api *HttpApiClient) Get(url string, params map[string]interface{}, respons
 	}
 
 	err = json.Unmarshal(buf, &response)
-	log.Println(response)
 	if err != nil {
 		return errors.New(fmt.Sprint("error parsing body response:", err.Error()))
 	}

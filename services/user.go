@@ -1,6 +1,8 @@
 package services
 
 import (
+	"log"
+
 	"github.com/EloYaniel/academy-go-q42021/apiclient"
 	e "github.com/EloYaniel/academy-go-q42021/entities"
 	repo "github.com/EloYaniel/academy-go-q42021/repositories/contracts"
@@ -9,30 +11,39 @@ import (
 type UserService struct {
 	repo      repo.UserRepository
 	apiClient apiclient.ApiClient
+	userURL   string
 }
 
-func NewUserService(repo repo.UserRepository, client apiclient.ApiClient) *UserService {
-	return &UserService{repo: repo, apiClient: client}
+func NewUserService(repo repo.UserRepository, client apiclient.ApiClient, userURL string) *UserService {
+	return &UserService{repo: repo, apiClient: client, userURL: userURL}
 }
 
 func (s *UserService) GetUsers() ([]e.User, error) {
-	users, _ := s.repo.GetUsers()
+	users, err := s.repo.GetUsers()
 
-	if len(users) == 0 {
-		resp := struct {
-			Data []e.User
-		}{}
-		err := s.apiClient.Get("https://reqres.in/api/users", nil, &resp)
+	if err != nil {
+		log.Println(err)
+	}
 
-		if err != nil {
-			return nil, err
-		}
+	if len(users) > 0 {
+		return users, nil
+	}
 
-		users = resp.Data
-		if err != nil {
-			return nil, err
-		}
-		s.repo.SaveUsers(users)
+	resp := struct {
+		Data []e.User
+	}{}
+	err = s.apiClient.Get(s.userURL, nil, &resp)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+	users = resp.Data
+	err = s.repo.SaveUsers(users)
+
+	if err != nil {
+		log.Println(err)
+		return nil, err
 	}
 
 	return users, nil

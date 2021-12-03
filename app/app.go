@@ -15,7 +15,7 @@ func InitApp() *mux.Router {
 	csvuserrepository := repo.NewCSVUserRepository("data/users.csv")
 
 	mlbplayerservice := srv.NewMLBPlayerService(csvmlbrepository)
-	userservice := srv.NewUserService(csvuserrepository, apiclient)
+	userservice := srv.NewUserService(csvuserrepository, apiclient, "https://reqres.in/api/users")
 
 	healthcontroller := ctr.NewHealthController()
 	mlbplayercontroller := ctr.NewMLBPlayerController(mlbplayerservice)
