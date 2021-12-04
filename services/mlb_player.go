@@ -34,3 +34,13 @@ func (s *MLBPlayerService) GetMLBPlayerByID(id int) (*e.MLBPlayer, error) {
 
 	return player, err
 }
+
+func (s *MLBPlayerService) GetMLBPlayerDesired(filterType string, totalItems int, itemsPerWorker int) ([]e.MLBPlayer, error) {
+	players, err := s.repository.GetMLBPlayerDesired(filterType, totalItems, itemsPerWorker)
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	return players, err
+}

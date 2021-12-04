@@ -27,6 +27,9 @@ func InitApp() *mux.Router {
 	r.HandleFunc("/mlb-players/{id}", mlbplayercontroller.GetMLBPlayerByID)
 	r.HandleFunc("/users", usercontroller.GetUsers)
 	r.HandleFunc("/users/{id}", usercontroller.GetUserByID)
+	r.Path("/random-mlb-players").
+		Queries("type", "{type}", "items", "{items}", "items_per_workers", "{items_per_workers}").
+		HandlerFunc(mlbplayercontroller.GetMLBPlayerDesired)
 
 	return r
 }

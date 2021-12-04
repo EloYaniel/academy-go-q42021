@@ -9,9 +9,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
+var allowedTypeFilters = map[string]bool{"even": true, "odd": true}
+
 type mlbPlayerService interface {
 	GetMLBPlayers() ([]e.MLBPlayer, error)
 	GetMLBPlayerByID(id int) (*e.MLBPlayer, error)
+	GetMLBPlayerDesired(filterType string, totalItems int, itemsPerWorker int) ([]e.MLBPlayer, error)
 }
 
 type errorMessage struct {
@@ -74,4 +77,60 @@ func (ctr *MLBPlayerController) GetMLBPlayerByID(w http.ResponseWriter, r *http.
 	}
 
 	json.NewEncoder(w).Encode(player)
+}
+
+func (ctr *MLBPlayerController) GetMLBPlayerDesired(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	filterType := r.FormValue("type")
+
+	if v, ok := allowedTypeFilters[filterType]; !ok || !v {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorMessage{
+			Message: "type param value is not allowed",
+		})
+
+		return
+	}
+	itemsperworkers, err := strconv.Atoi(r.FormValue("items_per_workers"))
+
+	if err != nil || itemsperworkers <= 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorMessage{
+			Message: "items_per_workers param must be a positive integer",
+		})
+
+		return
+	}
+
+	items, err := strconv.Atoi(r.FormValue("items"))
+
+	if err != nil || items <= 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorMessage{
+			Message: "items param must be a positive integer",
+		})
+
+		return
+	}
+
+	if itemsperworkers > items {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(errorMessage{
+			Message: "items_per_workers param must be less or equal items param",
+		})
+
+		return
+	}
+	players, err := ctr.service.GetMLBPlayerDesired(filterType, items, itemsperworkers)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(errorMessage{
+			Message: "Internal server error",
+		})
+
+		return
+	}
+
+	json.NewEncoder(w).Encode(players)
 }
