@@ -1,5 +1,6 @@
 package entities
 
+// MLBPlayer struct has MLB Player business info.
 type MLBPlayer struct {
 	ID       int     `json:"id"`
 	Name     string  `json:"name"`

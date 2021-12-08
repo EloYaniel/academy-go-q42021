@@ -10,14 +10,17 @@ import (
 	e "github.com/EloYaniel/academy-go-q42021/entities"
 )
 
+// CSVUserRepository struct implements UserRepository interface
 type CSVUserRepository struct {
 	filePath string
 }
 
+// NewCSVUserRepository function creates a new instance of type CSVUserRepository.
 func NewCSVUserRepository(filePath string) *CSVUserRepository {
 	return &CSVUserRepository{filePath: filePath}
 }
 
+// SaveUsers saves all users to the file.
 func (repo *CSVUserRepository) SaveUsers(users []e.User) error {
 	csvFile, err := os.Create(repo.filePath)
 
@@ -50,6 +53,7 @@ func (repo *CSVUserRepository) SaveUsers(users []e.User) error {
 	return nil
 }
 
+// GetUsers gets all Users from the file.
 func (repo *CSVUserRepository) GetUsers() ([]e.User, error) {
 	f, err := os.Open(repo.filePath)
 
@@ -84,6 +88,7 @@ func (repo *CSVUserRepository) GetUsers() ([]e.User, error) {
 	return users, nil
 }
 
+// GetUserByID get a User by its ID.
 func (repo *CSVUserRepository) GetUserByID(id int) (*e.User, error) {
 	users, err := repo.GetUsers()
 

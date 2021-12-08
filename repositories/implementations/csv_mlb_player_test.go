@@ -28,7 +28,7 @@ var player2 = e.MLBPlayer{
 	Age:      34.69,
 }
 
-func Test_NewCSVMLBPlayerRepository_ShouldReturnDiffInstances(t *testing.T) {
+func Test_CSVMLBPlayerRepository_ShouldReturnDiffInstances(t *testing.T) {
 	instance := NewCSVMLBPlayerRepository("here.csv")
 	instance2 := NewCSVMLBPlayerRepository("there.csv")
 
@@ -145,6 +145,95 @@ func Test_GetPlayerByID_Suite(t *testing.T) {
 			player, err := repo.GetMLBPlayerByID(tc.playerID)
 
 			assert.Equal(t, tc.expectedResponse, player)
+			assert.Equal(t, tc.expectedError, err)
+		})
+	}
+}
+
+func Test_GetMLBPlayerDesired_Suite(t *testing.T) {
+	testCases := []struct {
+		name             string
+		filter           string
+		totalItems       int
+		itemsPerWorker   int
+		filePath         string
+		expectedError    error
+		expectedResponse []e.MLBPlayer
+	}{
+		{
+			name:           "Should return players with odd ID",
+			filePath:       "../../data/mlb_players.csv",
+			filter:         "odd",
+			itemsPerWorker: 1,
+			totalItems:     2,
+			expectedResponse: []e.MLBPlayer{
+				{
+					ID:       1,
+					Name:     "Adam Donachie",
+					Team:     "BAL",
+					Position: "Catcher",
+					Height:   74,
+					Weight:   180,
+					Age:      22.99,
+				},
+				{
+
+					ID:       3,
+					Name:     "Ramon Hernandez",
+					Team:     "BAL",
+					Position: "Catcher",
+					Height:   72,
+					Weight:   210,
+					Age:      30.78,
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name:           "Should return players with even ID",
+			filePath:       "../../data/mlb_players.csv",
+			filter:         "even",
+			itemsPerWorker: 1,
+			totalItems:     2,
+			expectedResponse: []e.MLBPlayer{
+				{
+					ID:       2,
+					Name:     "Paul Bako",
+					Team:     "BAL",
+					Position: "Catcher",
+					Height:   74,
+					Weight:   215,
+					Age:      34.69,
+				},
+				{
+
+					ID:       4,
+					Name:     "Kevin Millar",
+					Team:     "BAL",
+					Position: "First Baseman",
+					Height:   72,
+					Weight:   210,
+					Age:      35.43,
+				},
+			},
+			expectedError: nil,
+		},
+		{
+			name:             "Should return error when open file",
+			filePath:         "",
+			expectedResponse: nil,
+			expectedError:    errors.New("error opening the file"),
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+
+			repo := NewCSVMLBPlayerRepository(tc.filePath)
+
+			users, err := repo.GetMLBPlayerDesired(tc.filter, tc.totalItems, tc.itemsPerWorker)
+
+			assert.Equal(t, tc.expectedResponse, users)
 			assert.Equal(t, tc.expectedError, err)
 		})
 	}
