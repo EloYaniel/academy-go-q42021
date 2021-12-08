@@ -16,8 +16,9 @@ type HttpApiClient struct {
 	client *http.Client
 }
 
+var once = sync.Once{}
+
 func GetHttpApiClientInstance() *HttpApiClient {
-	once := sync.Once{}
 	once.Do(func() {
 		client := &http.Client{
 			Timeout: time.Second * 10,

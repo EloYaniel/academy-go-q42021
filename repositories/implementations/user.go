@@ -4,7 +4,6 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
@@ -23,7 +22,7 @@ func (repo *CSVUserRepository) SaveUsers(users []e.User) error {
 	csvFile, err := os.Create(repo.filePath)
 
 	if err != nil {
-		return errors.New(fmt.Sprint("error opening o creating the file:", err.Error()))
+		return errors.New("error opening o creating the file")
 	}
 	defer csvFile.Close()
 	csvwriter := csv.NewWriter(csvFile)
@@ -55,14 +54,12 @@ func (repo *CSVUserRepository) GetUsers() ([]e.User, error) {
 	f, err := os.Open(repo.filePath)
 
 	if err != nil {
-		log.Println("error opening the file", err)
 		return nil, errors.New("error opening the file")
 	}
 	defer f.Close()
 	data, err := csv.NewReader(f).ReadAll()
 
 	if err != nil {
-		log.Println("error reading the file: ", err)
 		return nil, errors.New("error reading the file")
 	}
 	var users []e.User
@@ -71,7 +68,7 @@ func (repo *CSVUserRepository) GetUsers() ([]e.User, error) {
 			id, err := strconv.Atoi(line[0])
 
 			if err != nil {
-				return nil, errors.New("error casting ID" + err.Error())
+				return nil, errors.New("error casting ID")
 			}
 			users = append(users, e.User{
 				ID:        id,

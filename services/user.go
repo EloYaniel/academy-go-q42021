@@ -43,7 +43,6 @@ func (s *UserService) GetUsers() ([]e.User, error) {
 
 	if err != nil {
 		log.Println(err)
-		return nil, err
 	}
 
 	return users, nil
