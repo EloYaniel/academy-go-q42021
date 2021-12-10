@@ -1,5 +1,6 @@
 package entities
 
+// User struct has User business info.
 type User struct {
 	ID        int    `json:"id"`
 	Email     string `json:"email"`

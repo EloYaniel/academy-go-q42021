@@ -8,16 +8,19 @@ import (
 	repo "github.com/EloYaniel/academy-go-q42021/repositories/contracts"
 )
 
+// UserService struct handles Users business logic.
 type UserService struct {
 	repo      repo.UserRepository
 	apiClient apiclient.ApiClient
 	userURL   string
 }
 
+// NewUserService function return an instance of UserService
 func NewUserService(repo repo.UserRepository, client apiclient.ApiClient, userURL string) *UserService {
 	return &UserService{repo: repo, apiClient: client, userURL: userURL}
 }
 
+// GetUsers gets all Users
 func (s *UserService) GetUsers() ([]e.User, error) {
 	users, err := s.repo.GetUsers()
 
@@ -48,6 +51,7 @@ func (s *UserService) GetUsers() ([]e.User, error) {
 	return users, nil
 }
 
+// GetUserByID get a User by its ID
 func (s *UserService) GetUserByID(id int) (*e.User, error) {
 	return s.repo.GetUserByID(id)
 }

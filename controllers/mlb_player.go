@@ -21,14 +21,17 @@ type errorMessage struct {
 	Message string `json:"message"`
 }
 
+// MLBPlayerController struct handles api controller.
 type MLBPlayerController struct {
 	service mlbPlayerService
 }
 
+// MLBPlayerController function creates an instance of NewMLBPlayerController.
 func NewMLBPlayerController(service mlbPlayerService) *MLBPlayerController {
 	return &MLBPlayerController{service: service}
 }
 
+// GetMLBPlayers handles list of MLB Players
 func (ctr *MLBPlayerController) GetMLBPlayers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	players, err := ctr.service.GetMLBPlayers()
@@ -43,6 +46,7 @@ func (ctr *MLBPlayerController) GetMLBPlayers(w http.ResponseWriter, r *http.Req
 	json.NewEncoder(w).Encode(players)
 }
 
+// GetMLBPlayers handles MLB Players by ID.
 func (ctr *MLBPlayerController) GetMLBPlayerByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
@@ -79,6 +83,7 @@ func (ctr *MLBPlayerController) GetMLBPlayerByID(w http.ResponseWriter, r *http.
 	json.NewEncoder(w).Encode(player)
 }
 
+// GetMLBPlayerDesired handles list of MLB Players by filters.
 func (ctr *MLBPlayerController) GetMLBPlayerDesired(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	filterType := r.FormValue("type")
@@ -132,5 +137,11 @@ func (ctr *MLBPlayerController) GetMLBPlayerDesired(w http.ResponseWriter, r *ht
 		return
 	}
 
-	json.NewEncoder(w).Encode(players)
+	json.NewEncoder(w).Encode(struct {
+		Count   int           `json:"total"`
+		Players []e.MLBPlayer `json:"players"`
+	}{
+		len(players),
+		players,
+	})
 }

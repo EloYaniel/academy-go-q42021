@@ -15,14 +15,17 @@ type userService interface {
 	GetUserByID(id int) (*e.User, error)
 }
 
+// MLBPlayerController struct handles api controller.
 type UserController struct {
 	service userService
 }
 
+// NewUserController function creates an instance of UserController.
 func NewUserController(service userService) *UserController {
 	return &UserController{service: service}
 }
 
+// GetUsers handles list of Users
 func (ctr *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	users, err := ctr.service.GetUsers()
@@ -38,6 +41,7 @@ func (ctr *UserController) GetUsers(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(users)
 }
 
+// GetUserByID handles Users by ID.
 func (ctr *UserController) GetUserByID(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	vars := mux.Vars(r)
